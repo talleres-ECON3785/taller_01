@@ -124,7 +124,7 @@ período/duración de "la sesión", y si `time_spent` está en segundos o minuto
 
 | Criterio de exclusión | N antes | N después |
 | ----------------------| ------- | ----------|
-|                       |         |           |
+| Observaciones con algún NA (`experimento.Rds`) | 10000 | 10000 |
 
 ## Entregable: presentación al cliente
 
