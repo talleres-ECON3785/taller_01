@@ -1,0 +1,163 @@
+# CLAUDE.md: reglas del proyecto
+
+## Contexto del proyecto
+
+Taller 1 de Ciencia de Datos y Econometría Aplicada (ECON-3785, 2026-2, Universidad
+de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónico.
+
+- **Pregunta de negocio:** ¿debería CheMarket invertir en impulsar el registro
+  (`sign_up`) de sus usuarios para aumentar sus ingresos (`Revenue`)?
+- **Dos fuentes de datos**, con roles distintos y no intercambiables:
+  - `observacional.Rds`: datos históricos del comportamiento de los usuarios. Permite
+    describir/predecir, pero no identifica el efecto causal de aumentar el registro.
+  - `experimento.Rds`: prueba A/B con asignación aleatoria a `easier_signup`
+    (registro facilitado). Permite estimar el efecto causal de esa intervención.
+- El taller consiste en distinguir con cuidado qué puede afirmarse con cada base y
+  qué no, y en no confundir correlación (datos históricos) con efecto causal
+  (experimento).
+- **Entregable final:** una presentación al cliente en `08_Entregables/`, sin
+  código, estilo *answer-first* (ver sección "Entregable: presentación al cliente").
+
+## Estructura del proyecto
+
+- `01_Datos/01_Crudos/`      datos originales. NUNCA se modifican
+- `01_Datos/02_Procesados/`  datos limpios o transformados
+- `01_Datos/03_Listos/`      bases finales que ingresan al análisis
+- `02_Scripts/`              scripts de R
+- `03_Resultados/`           Tablas/ y Figuras/ generadas
+- `04_Presentaciones/`       borradores de la presentación
+- `05_Notas/`                notas e ideas preliminares
+- `06_Bitacoras/`            documentación de cada sesión de trabajo
+- `07_Recursos/`             referencias externas y documentación
+- `08_Entregables/`          presentación final y video
+
+## Reglas de trabajo
+
+- Lenguaje principal: R. Utilice `tidyverse` cuando resulte apropiado.
+- Explique lo que va a hacer ANTES de editar o crear archivos.
+- Utilice rutas relativas ancladas a la carpeta del proyecto.
+- Redacte los comentarios del código en español.
+- Fije la semilla `set.seed(2026)` en cualquier análisis con componente aleatorio
+  (p. ej. partición muestral).
+- Evalúe el desempeño predictivo siempre fuera de muestra (train/test), nunca
+  dentro de muestra.
+- Al cerrar una sesión, escriba una bitácora en `06_Bitacoras/` con lo que se
+  hizo, por qué, qué se descubrió y qué problemas se presentaron.
+
+## Regla metodológica: solo regresión lineal
+
+- El único modelo permitido en este taller es la regresión lineal (incluyendo el
+  modelo de probabilidad lineal para `sign_up` u otras variables binarias), tanto
+  para predecir como para estimar el efecto del experimento.
+- No proponga ni ajuste otros modelos (matching, árboles, bosques aleatorios,
+  boosting, redes neuronales, etc.), **aunque parezcan más apropiados**. Esta
+  restricción es intencional: el objetivo del taller es entender a fondo qué
+  puede y no puede estimarse con una regresión.
+- Distinga siempre tres cosas al reportar un resultado: el **estimando** (lo que
+  se quiere conocer), el **estimador** (la regresión lineal) y la **estimación**
+  (el número obtenido).
+
+## Datos
+
+- El flujo es Crudos, Procesados, Listos. Nunca en sentido inverso.
+- Reporte siempre cuántas observaciones se pierden al limpiar o filtrar.
+
+## Primero el diseño, después los resultados
+
+- No emita juicios sobre si un resultado es "bueno" o "malo".
+- No exprese entusiasmo por un coeficiente ni por su significancia.
+- Mientras el diseño no esté resuelto, lo único relevante es si la especificación es correcta.
+
+## Integrantes
+
+| Nombre           | Rol / responsabilidad          | Contacto                   |
+| ---------------- | ------------------------------ | -------------------------- |
+| Samuel Escandón | Análisis de Datos históricos | s.escandoc@uniandes.edu.co |
+|Douglas Plazas Guzman |Análisis de Datos históricos | d.plazasg@uniandes.edu.co|
+|Mateo Olmos Becerra | Análisis de Datos Experimento A/B | m.olmosb@uniandes.edu.co |
+|Santiago Martinez Lopez |Diseño de Presentación y Análisis A/B | s.martinezl@uniandes.edu.co |
+|Santiago Muñoz Martínez| Análisis de Datos Experimento A/B |s.munozm234@uniandes.edu.co|
+<!-- Miembros del grupo y responsabilidades. Permite identificar al interlocutor
+     y a quién corresponde cada decisión. -->
+
+## Decisiones tomadas
+
+<!-- Registro acumulado de decisiones metodológicas y su justificación, para no
+     perder de vista por qué se hizo algo varias semanas después. -->
+
+| Fecha | Decisión | Justificación |
+| ----- | --------- | -------------- |
+|       |           |                |
+
+## Análisis descartados
+
+<!-- Especificaciones, variables o enfoques que se probaron y abandonaron, con
+     la razón, para no repetir procedimientos ya infructuosos. -->
+
+| Fecha | Análisis/especificación descartada | Razón |
+| ----- | ------------------------------------ | ------ |
+|       |                                      |        |
+
+## Definición de variables
+
+<!-- Definición operativa de cada variable usada en el análisis: qué incluye,
+     unidades, moneda, período y fuente. -->
+
+Definiciones tal como las da el enunciado del taller. Pendiente confirmar al
+explorar los datos: unidades y moneda de `Revenue` (¿incluye impuestos?),
+período/duración de "la sesión", y si `time_spent` está en segundos o minutos.
+
+| Variable | Definición | Fuente |
+| -------- | ----------- | ------ |
+| `Revenue` | Gasto del usuario en la sesión. Moneda/si incluye impuestos: **pendiente de confirmar**. | `observacional.Rds`, `experimento.Rds` |
+| `sign_up` | Si el usuario se registró (binaria). | `observacional.Rds`, `experimento.Rds` |
+| `time_spent` | Tiempo en el sitio en la sesión. Unidad: **pendiente de confirmar**. | `observacional.Rds`, `experimento.Rds` |
+| `past_sessions` | Número de sesiones anteriores. | `observacional.Rds`, `experimento.Rds` |
+| `device_type` | Dispositivo usado: `mobile`, `desktop` o `tablet`. | `observacional.Rds`, `experimento.Rds` |
+| `is_returning_user` | Si el usuario ya había visitado antes (binaria). | `observacional.Rds`, `experimento.Rds` |
+| `easier_signup` | Asignación al tratamiento del experimento (registro facilitado, binaria). | `experimento.Rds` (no existe en `observacional.Rds`) |
+
+## Restricciones de muestra
+
+<!-- Criterios de exclusión aplicados y el N resultante en cada paso, para que
+     el N reportado sea verificable. -->
+
+| Criterio de exclusión | N antes | N después |
+| ---------------------- | ------- | ---------- |
+|                        |         |            |
+
+## Entregable: presentación al cliente
+
+<!-- Lineamientos del enunciado para la presentación final, estilo "McKinsey way". -->
+
+- Estilo *answer-first*: la recomendación va al inicio, no al final.
+- Principio de la pirámide: mensaje principal arriba, 2-4 argumentos de apoyo
+  debajo, evidencia sosteniendo cada argumento.
+- Una idea por slide: el título debe comunicar la conclusión, no el tema (evitar
+  títulos como "Resultados del experimento").
+- MECE: cubrir lo importante sin repetirse.
+- Enfocarse en el "so what?": un dato solo si sostiene una conclusión o decisión.
+- Cerrar con decisiones y próximos pasos que necesita el cliente.
+- Ser explícitos sobre qué respalda la evidencia histórica y qué agrega el
+  experimento.
+- **No incluir código en la presentación.**
+
+## Estado actual
+
+<!-- Punto de avance del proyecto al cierre de la última sesión: qué está
+     hecho, qué sigue, dónde se quedó el trabajo. -->
+
+- Estructura de carpetas y `CLAUDE.md` creados. Aún no se han descargado
+  `observacional.Rds` ni `experimento.Rds` (disponibles en Bloque Neón) hacia
+  `01_Datos/01_Crudos/`.
+- No se ha escrito ningún script todavía.
+
+## Reglas estrictas
+
+<!-- Acciones que requieren autorización previa del equipo antes de ejecutarse. -->
+
+- No modificar ni sobrescribir archivos en `01_Datos/01_Crudos/`.
+- No eliminar ni mover archivos fuera de la estructura del proyecto sin autorización.
+- No usar modelos distintos a la regresión lineal, aunque el agente los sugiera
+  (ver "Regla metodológica: solo regresión lineal").
+- No incluir código en la presentación final.
