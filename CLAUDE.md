@@ -70,13 +70,13 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
 
 ## Integrantes
 
-| Nombre           | Rol / responsabilidad          | Contacto                   |
+| Nombre | Rol / responsabilidad | Contacto |
 | ---------------- | ------------------------------ | -------------------------- |
-| Samuel Escandón | Análisis de Datos históricos | s.escandoc@uniandes.edu.co |
-|Douglas Plazas Guzman |Análisis de Datos históricos | d.plazasg@uniandes.edu.co|
-|Mateo Olmos Becerra | Análisis de Datos Experimento A/B | m.olmosb@uniandes.edu.co |
-|Santiago Martinez Lopez |Diseño de Presentación y Análisis A/B | s.martinezl@uniandes.edu.co |
-|Santiago Muñoz Martínez| Análisis de Datos Experimento A/B |s.munozm234@uniandes.edu.co|
+| Samuel Escandón | Análisis de Datos históricos | <s.escandoc@uniandes.edu.co> |
+| Douglas Plazas Guzman | Análisis de Datos históricos | <d.plazasg@uniandes.edu.co> |
+| Mateo Olmos Becerra | Análisis de Datos Experimento A/B | <m.olmosb@uniandes.edu.co> |
+| Santiago Martinez Lopez | Diseño de Presentación y Análisis A/B | <s.martinezl@uniandes.edu.co> |
+| Santiago Muñoz Martínez | Análisis de Datos Experimento A/B | <s.munozm234@uniandes.edu.co> |
 <!-- Miembros del grupo y responsabilidades. Permite identificar al interlocutor
      y a quién corresponde cada decisión. -->
 
@@ -86,8 +86,8 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
      perder de vista por qué se hizo algo varias semanas después. -->
 
 | Fecha | Decisión | Justificación |
-| ----- | --------- | -------------- |
-|       |           |                |
+| ----- | ---------| --------------|
+|       |          |               |
 
 ## Análisis descartados
 
@@ -95,8 +95,8 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
      la razón, para no repetir procedimientos ya infructuosos. -->
 
 | Fecha | Análisis/especificación descartada | Razón |
-| ----- | ------------------------------------ | ------ |
-|       |                                      |        |
+| ----- | -----------------------------------| ------|
+|       |                                    |       |
 
 ## Definición de variables
 
@@ -123,8 +123,8 @@ período/duración de "la sesión", y si `time_spent` está en segundos o minuto
      el N reportado sea verificable. -->
 
 | Criterio de exclusión | N antes | N después |
-| ---------------------- | ------- | ---------- |
-|                        |         |            |
+| ----------------------| ------- | ----------|
+|                       |         |           |
 
 ## Entregable: presentación al cliente
 
