@@ -1,0 +1,5 @@
+conjunto,modelo,r2
+Entrenamiento,Simple (sin quiebre),0.16988089117579352
+Entrenamiento,Segmentado (con quiebre),0.2939794380739318
+Prueba,Simple (sin quiebre),0.1631559634295492
+Prueba,Segmentado (con quiebre),0.2897712130274876
