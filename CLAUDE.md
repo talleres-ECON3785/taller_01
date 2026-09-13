@@ -70,13 +70,14 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
 
 ## Integrantes
 
-| Nombre | Rol / responsabilidad | Contacto |
-| ---------------- | ------------------------------ | -------------------------- |
-| Samuel Escandón | Análisis de Datos históricos | <s.escandoc@uniandes.edu.co> |
-| Douglas Plazas Guzman | Análisis de Datos históricos | <d.plazasg@uniandes.edu.co> |
-| Mateo Olmos Becerra | Análisis de Datos Experimento A/B | <m.olmosb@uniandes.edu.co> |
-| Santiago Martinez Lopez | Diseño de Presentación y Análisis A/B | <s.martinezl@uniandes.edu.co> |
-| Santiago Muñoz Martínez | Análisis de Datos Experimento A/B | <s.munozm234@uniandes.edu.co> |
+| Nombre                    | Rol / responsabilidad                    | Contacto                                                         |
+| ------------------------- | ---------------------------------------- | ---------------------------------------------------------------- |
+| Samuel Escandón          | Análisis de Datos históricos           | [s.escandoc@uniandes.edu.co](mailto:s.escandoc@uniandes.edu.co)   |
+| Douglas Plazas Guzman     | Análisis de Datos históricos           | [d.plazasg@uniandes.edu.co](mailto:d.plazasg@uniandes.edu.co)     |
+| Mateo Olmos Becerra       | Análisis de Datos Experimento A/B       | [m.olmosb@uniandes.edu.co](mailto:m.olmosb@uniandes.edu.co)       |
+| Santiago Martinez Lopez   | Diseño de Presentación y Análisis A/B | [s.martinezl@uniandes.edu.co](mailto:s.martinezl@uniandes.edu.co) |
+| Santiago Muñoz Martínez | Análisis de Datos Experimento A/B       | [s.munozm234@uniandes.edu.co](mailto:s.munozm234@uniandes.edu.co) |
+
 <!-- Miembros del grupo y responsabilidades. Permite identificar al interlocutor
      y a quién corresponde cada decisión. -->
 
@@ -85,9 +86,9 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
 <!-- Registro acumulado de decisiones metodológicas y su justificación, para no
      perder de vista por qué se hizo algo varias semanas después. -->
 
-| Fecha | Decisión | Justificación |
-| ----- | ---------| --------------|
-| 2026-09-12 | El estimando central del experimento es el ITT de `easier_signup` sobre `Revenue`; el efecto sobre `sign_up` (primer estadio) se reporta como mecanismo, no como respuesta final. | `easier_signup` es la variable que CheMarket puede manipular directamente; `sign_up` es un resultado intermedio, no la palanca de política. |
+| Fecha      | Decisión                                                                                                                                                                              | Justificación                                                                                                                                   |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-09-12 | El estimando central del experimento es el ITT de`easier_signup` sobre `Revenue`; el efecto sobre `sign_up` (primer estadio) se reporta como mecanismo, no como respuesta final. | `easier_signup` es la variable que CheMarket puede manipular directamente; `sign_up` es un resultado intermedio, no la palanca de política. |
 
 ## Análisis descartados
 
@@ -95,8 +96,8 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
      la razón, para no repetir procedimientos ya infructuosos. -->
 
 | Fecha | Análisis/especificación descartada | Razón |
-| ----- | -----------------------------------| ------|
-|       |                                    |       |
+| ----- | ------------------------------------ | ------ |
+|       |                                      |        |
 
 ## Definición de variables
 
@@ -107,32 +108,29 @@ Definiciones tal como las da el enunciado del taller. Pendiente confirmar al
 explorar los datos: unidades y moneda de `Revenue` (¿incluye impuestos?),
 período/duración de "la sesión", y si `time_spent` está en segundos o minutos.
 
-| Variable | Definición | Fuente |
-| -------- | ----------- | ------ |
-| `Revenue` | Gasto del usuario en la sesión. Moneda/si incluye impuestos: **pendiente de confirmar**. | `observacional.Rds`, `experimento.Rds` |
-| `sign_up` | Si el usuario se registró (binaria). | `observacional.Rds`, `experimento.Rds` |
-| `time_spent` | Tiempo en el sitio en la sesión. Unidad: **pendiente de confirmar**. | `observacional.Rds`, `experimento.Rds` |
-| `past_sessions` | Número de sesiones anteriores. | `observacional.Rds`, `experimento.Rds` |
-| `device_type` | Dispositivo usado: `mobile`, `desktop` o `tablet`. | `observacional.Rds`, `experimento.Rds` |
-| `is_returning_user` | Si el usuario ya había visitado antes (binaria). | `observacional.Rds`, `experimento.Rds` |
-| `easier_signup` | Asignación al tratamiento del experimento (registro facilitado, binaria). | `experimento.Rds` (no existe en `observacional.Rds`) |
-| `os_type` | Sistema operativo: `osx`, `windows` u `other`. No estaba en el enunciado original; se encontró al explorar `datos_historicos.Rds` (2026-09-12). No se limpió ni describió en la sesión de limpieza/descriptivas de `observacional.Rds`; pendiente decidir si se usa en el análisis. | `observacional.Rds`, `experimento.Rds` |
+| Variable              | Definición                                                                                                                                                                                                                                                                                       | Fuente                                                   |
+| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `Revenue`           | Gasto del usuario en la sesión.                                                                                                                                                                                                                                                                 | `observacional.Rds`, `experimento.Rds`               |
+| `sign_up`           | Si el usuario se registró (binaria).                                                                                                                                                                                                                                                             | `observacional.Rds`, `experimento.Rds`               |
+| `time_spent`        | Tiempo en el sitio en la sesión.                                                                                                                                                                                                                                                                 | `observacional.Rds`, `experimento.Rds`               |
+| `past_sessions`     | Número de sesiones anteriores.                                                                                                                                                                                                                                                                   | `observacional.Rds`, `experimento.Rds`               |
+| `device_type`       | Dispositivo usado:`mobile`, `desktop` o `tablet`.                                                                                                                                                                                                                                           | `observacional.Rds`, `experimento.Rds`               |
+| `is_returning_user` | Si el usuario ya había visitado antes (binaria).                                                                                                                                                                                                                                                 | `observacional.Rds`, `experimento.Rds`               |
+| `easier_signup`     | Asignación al tratamiento del experimento (registro facilitado, binaria).                                                                                                                                                                                                                        | `experimento.Rds` (no existe en `observacional.Rds`) |
+| `os_type`           | Sistema operativo:`osx`, `windows` u `other`. No estaba en el enunciado original; se encontró al explorar `datos_historicos.Rds` (2026-09-12). No se limpió ni describió en la sesión de limpieza/descriptivas de `observacional.Rds`; pendiente decidir si se usa en el análisis. | `observacional.Rds`, `experimento.Rds`               |
 
 **Nota (2026-09-12):** los archivos crudos reales se llaman `datos_historicos.Rds`
 (observacional) y `datos_experimento.Rds`, no `observacional.Rds`/`experimento.Rds`
-como dice el enunciado citado arriba. Aún pendiente confirmar unidad de
-`time_spent` y si `Revenue` incluye impuestos: en `datos_historicos.Rds` limpio,
-`Revenue` va de 0.55 a 36.29 (media 3.98) y `time_spent` de 0.0001 a 54.4 (media
-4.99); estos rangos no bastan por sí solos para confirmar unidad/moneda.
+como dice el enunciado citado arriba. 
 
 ## Restricciones de muestra
 
 <!-- Criterios de exclusión aplicados y el N resultante en cada paso, para que
      el N reportado sea verificable. -->
 
-| Criterio de exclusión | N antes | N después |
-| ----------------------| ------- | ----------|
-| Observaciones con algún NA (`experimento.Rds`) | 10000 | 10000 |
+| Criterio de exclusión                            | N antes | N después |
+| ------------------------------------------------- | ------- | ---------- |
+| Observaciones con algún NA (`experimento.Rds`) | 10000   | 10000      |
 
 ## Entregable: presentación al cliente
 
