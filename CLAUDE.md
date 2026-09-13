@@ -87,7 +87,7 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
 
 | Fecha | Decisión | Justificación |
 | ----- | ---------| --------------|
-|       |          |               |
+| 2026-09-12 | El estimando central del experimento es el ITT de `easier_signup` sobre `Revenue`; el efecto sobre `sign_up` (primer estadio) se reporta como mecanismo, no como respuesta final. | `easier_signup` es la variable que CheMarket puede manipular directamente; `sign_up` es un resultado intermedio, no la palanca de política. |
 
 ## Análisis descartados
 
