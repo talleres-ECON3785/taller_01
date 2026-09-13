@@ -95,9 +95,10 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
 <!-- Especificaciones, variables o enfoques que se probaron y abandonaron, con
      la razón, para no repetir procedimientos ya infructuosos. -->
 
-| Fecha | Análisis/especificación descartada | Razón |
-| ----- | ------------------------------------ | ------ |
-|       |                                      |        |
+| Fecha      | Análisis/especificación descartada                                                                                  | Razón                                                                                                                                                                                                                     |
+| ---------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-13 | Hipótesis de sesgo de variable omitida en `itt_sencillo` por `time_spent` (se estimó `log_time_spent ~ easier_signup`) | El coeficiente es positivo y no estadísticamente significativo: no hay evidencia de que `easier_signup` afecte `time_spent`, así que no sostiene la hipótesis de que `time_spent` fuera un mediador/mal control del ITT. |
+| 2026-09-13 | Profundizar en IV/LATE usando `easier_signup` como instrumento de `sign_up`                                          | El primer estadio (`sign_up ~ easier_signup`) tiene coeficiente exactamente 1, por la correspondencia perfecta entre `sign_up` y `easier_signup` (ver tabla de contingencia, sección 1 de `06_analisis_experimento.R`). Por lo tanto LATE = ITT / 1 = ITT: no aporta información adicional a la ya obtenida con el ITT. |
 
 ## Definición de variables
 

@@ -14,7 +14,6 @@ str(data_experimento)
 #variables binarias 'easier_signup', 'is_returning_user' y 'sign_up' se
 #representan con 0 y 1, no es necesario cambiarlas.
 #'time_spent', 'past_sessions' y 'easier_signup' son numericas continuas
-#' 
 #' Time spent en minutos
 #' Ingresos en dolares
 
