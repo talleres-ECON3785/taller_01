@@ -116,6 +116,14 @@ período/duración de "la sesión", y si `time_spent` está en segundos o minuto
 | `device_type` | Dispositivo usado: `mobile`, `desktop` o `tablet`. | `observacional.Rds`, `experimento.Rds` |
 | `is_returning_user` | Si el usuario ya había visitado antes (binaria). | `observacional.Rds`, `experimento.Rds` |
 | `easier_signup` | Asignación al tratamiento del experimento (registro facilitado, binaria). | `experimento.Rds` (no existe en `observacional.Rds`) |
+| `os_type` | Sistema operativo: `osx`, `windows` u `other`. No estaba en el enunciado original; se encontró al explorar `datos_historicos.Rds` (2026-09-12). No se limpió ni describió en la sesión de limpieza/descriptivas de `observacional.Rds`; pendiente decidir si se usa en el análisis. | `observacional.Rds`, `experimento.Rds` |
+
+**Nota (2026-09-12):** los archivos crudos reales se llaman `datos_historicos.Rds`
+(observacional) y `datos_experimento.Rds`, no `observacional.Rds`/`experimento.Rds`
+como dice el enunciado citado arriba. Aún pendiente confirmar unidad de
+`time_spent` y si `Revenue` incluye impuestos: en `datos_historicos.Rds` limpio,
+`Revenue` va de 0.55 a 36.29 (media 3.98) y `time_spent` de 0.0001 a 54.4 (media
+4.99); estos rangos no bastan por sí solos para confirmar unidad/moneda.
 
 ## Restricciones de muestra
 
@@ -151,6 +159,19 @@ período/duración de "la sesión", y si `time_spent` está en segundos o minuto
   `observacional.Rds` ni `experimento.Rds` (disponibles en Bloque Neón) hacia
   `01_Datos/01_Crudos/`.
 - No se ha escrito ningún script todavía.
+- **2026-09-12 (rama `limpieza-descriptivas-observacional`):** los archivos
+  crudos ya están descargados en `01_Datos/01_Crudos/`, pero con nombres
+  distintos a los del enunciado: `datos_historicos.Rds` (base observacional,
+  100,000 obs.) y `datos_experimento.Rds` (base del experimento). Se
+  crearon `02_Scripts/01_limpieza_observacional.R` (limpieza y reporte de
+  calidad de `datos_historicos.Rds`, guarda
+  `01_Datos/02_Procesados/observacional_limpio.Rds`) y
+  `02_Scripts/02_descriptivas_observacional.R` (estadísticas univariadas,
+  por `sign_up`, correlaciones y figuras, todo en `03_Resultados/`). No se
+  ajustó ningún modelo. Quedan pendientes de decisión del equipo los
+  valores atípicos de `Revenue`, `time_spent` y `past_sessions` (ver
+  `03_Resultados/Tablas/reporte_calidad_observacional.csv` y la bitácora
+  `06_Bitacoras/2026-09-12_limpieza-descriptivas-observacional.md`).
 
 ## Reglas estrictas
 
