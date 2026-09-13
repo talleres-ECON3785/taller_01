@@ -1,0 +1,4 @@
+Paso,Observaciones restantes,Observaciones perdidas en este paso
+01. Base cruda (datos_historicos.Rds),100000,0
+02. Eliminar duplicados exactos de fila,100000,0
+03. Estandarizar tipos de columna (sin perdida de observaciones),100000,0

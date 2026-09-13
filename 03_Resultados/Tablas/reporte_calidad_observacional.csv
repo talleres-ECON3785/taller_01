@@ -1,0 +1,4 @@
+Variable,Problema,Observaciones afectadas,Alternativas de tratamiento,Decision aplicada
+Revenue,"Valores extremos fuera de [Q1-1.5*IQR, Q3+1.5*IQR] = [-0.93, 7.8]",8510,1) Mantener (pueden ser usuarios/sesiones legitimas de alto valor); 2) Marcar con indicador sin excluir; 3) Excluir si se confirma que son errores de captura,Pendiente de decision del equipo
+time_spent,"Valores extremos fuera de [Q1-1.5*IQR, Q3+1.5*IQR] = [-6.81, 15.14]",4949,1) Mantener (pueden ser usuarios/sesiones legitimas de alto valor); 2) Marcar con indicador sin excluir; 3) Excluir si se confirma que son errores de captura,Pendiente de decision del equipo
+past_sessions,"Valores extremos fuera de [Q1-1.5*IQR, Q3+1.5*IQR] = [-1, 7]",1186,1) Mantener (pueden ser usuarios/sesiones legitimas de alto valor); 2) Marcar con indicador sin excluir; 3) Excluir si se confirma que son errores de captura,Pendiente de decision del equipo
