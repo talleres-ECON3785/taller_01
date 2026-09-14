@@ -205,23 +205,88 @@ como dice el enunciado citado arriba.
 <!-- Punto de avance del proyecto al cierre de la última sesión: qué está
      hecho, qué sigue, dónde se quedó el trabajo. -->
 
-- Estructura de carpetas y `CLAUDE.md` creados. Aún no se han descargado
-  `observacional.Rds` ni `experimento.Rds` (disponibles en Bloque Neón) hacia
-  `01_Datos/01_Crudos/`.
-- No se ha escrito ningún script todavía.
-- **2026-09-12 (rama `limpieza-descriptivas-observacional`):** los archivos
-  crudos ya están descargados en `01_Datos/01_Crudos/`, pero con nombres
-  distintos a los del enunciado: `datos_historicos.Rds` (base observacional,
-  100,000 obs.) y `datos_experimento.Rds` (base del experimento). Se
-  crearon `02_Scripts/01_limpieza_observacional.R` (limpieza y reporte de
-  calidad de `datos_historicos.Rds`, guarda
-  `01_Datos/02_Procesados/observacional_limpio.Rds`) y
-  `02_Scripts/02_descriptivas_observacional.R` (estadísticas univariadas,
-  por `sign_up`, correlaciones y figuras, todo en `03_Resultados/`). No se
-  ajustó ningún modelo. Quedan pendientes de decisión del equipo los
-  valores atípicos de `Revenue`, `time_spent` y `past_sessions` (ver
-  `03_Resultados/Tablas/reporte_calidad_observacional.csv` y la bitácora
-  `06_Bitacoras/2026-09-12_limpieza-descriptivas-observacional.md`).
+**Última actualización: 2026-09-13 (rama `main`).**
+
+### Datos
+
+- Los dos archivos crudos están en `01_Datos/01_Crudos/`, con nombres distintos
+  a los del enunciado: `datos_historicos.Rds` (observacional, 100,000 obs.) y
+  `datos_experimento.Rds` (experimento, 10,000 obs.).
+- Base observacional limpia: `01_Datos/02_Procesados/observacional_limpio.Rds`
+  (100,000 obs.; la limpieza no pierde observaciones, ver
+  `03_Resultados/Tablas/reporte_calidad_observacional_embudo.csv`).
+- Base del experimento lista: `01_Datos/03_Listos/experimento_listos.RDS`
+  (10,000 obs.; tampoco se pierden observaciones por NA).
+- Pendiente: la base observacional no tiene todavía una versión en
+  `01_Datos/03_Listos/`; los scripts 02 y 08 leen directamente de Procesados.
+
+### Pipeline
+
+`00_main.R` (raíz del proyecto) corre el pipeline completo en una sola
+ejecución, cada script en su propio entorno, verificando antes que el
+directorio de trabajo sea la raíz. Scripts en `02_Scripts/`:
+
+| Script | Qué hace |
+| --- | --- |
+| `00_formato_graficas.R` | Paleta, tema y `guardar_figura()`. No genera figuras; lo cargan con `source()` los scripts que sí. |
+| `01_limpieza_observacional.R` | Limpia `datos_historicos.Rds` y reporta calidad. |
+| `02_descriptivas_observacional.R` | Univariadas, descriptivas por `sign_up`, correlaciones y 4 figuras. |
+| `03_procesar_datos_experimento.R` | Procesa `datos_experimento.Rds` → `experimento_listos.RDS`. |
+| `04_descriptivas_experimento.R` | Descriptivas de la base del experimento. |
+| `05_balance_experimento.R` | Balance de covariables entre control y tratamiento. |
+| `06_analisis_experimento.R` | Contingencia `sign_up` x `easier_signup`, ITT y chequeos de especificación. |
+| `07_graficas_experimento.R` | Seis figuras del experimento para la presentación. |
+| `08_discontinuidad_tiempo_revenue_observacional.R` | Búsqueda formal del quiebre `time_spent`–`Revenue` con validación fuera de muestra. |
+| `09_discontinuidad_tiempo_revenue_experimento.R` | Lo mismo en el experimento, más la comparación entre bases. |
+
+- **Pendiente:** `00_main.R` todavía lista solo los scripts 01–07 (su mensaje
+  final dice "los 7 scripts"); los scripts 08 y 09 se agregaron después y no
+  están incluidos, así que hoy hay que correrlos aparte.
+- Ningún script verifica que sus archivos de entrada existan antes de leerlos.
+
+### Resultados ya obtenidos
+
+- **Correspondencia perfecta entre `sign_up` y `easier_signup`** en el
+  experimento: los 5,043 del control no se registran y los 4,957 del
+  tratamiento sí (`tabla_contingencia_signup_easier_signup.csv`). Por eso el
+  primer estadio vale exactamente 1 y LATE = ITT (IV/LATE descartado).
+- **ITT sobre `log_revenue`:** 0.0134 sin controles y 0.0042 con controles;
+  ninguno estadísticamente distinguible de cero
+  (`tabla_itt_experimento.docx`).
+- **ITT sobre `Revenue` en nivel:** coeficiente 0.49 (p = 1.8e-11); medias 3.98
+  vs. 4.47, pero medianas casi idénticas (3.15 vs. 3.14). La diferencia se
+  concentra en la cola alta (p99: 14.4 vs. 24.9).
+- **Quiebre en `time_spent` = 5 minutos** en la relación con `Revenue`,
+  encontrado por rejilla en entrenamiento y confirmado fuera de muestra en
+  **ambas bases** (salto de nivel ≈3.13 obs. / ≈3.42 exp., significativo en
+  entrenamiento y prueba; cambio de pendiente no significativo). Es
+  **correlacional, no causal**, en las dos bases: `time_spent` no está
+  aleatorizado y es plausible causalidad inversa
+  (`comparacion_quiebre_observacional_experimento.csv`).
+- En `03_Resultados/` hay 14 figuras y 24 tablas, todas regenerables desde los
+  scripts.
+
+### Pendientes abiertos
+
+1. **Decidir el estimando central que se reporta:** el ITT es significativo en
+   nivel y no en logaritmo. Falta acordar cuál se presenta y cómo se comunica
+   la discrepancia sin sobre-interpretar ninguno de los dos.
+2. **Valores atípicos** de `Revenue`, `time_spent` y `past_sessions` en la base
+   observacional: sin decisión del equipo (ver
+   `reporte_calidad_observacional.csv`).
+3. **`os_type`**: sigue sin limpiarse ni describirse en la base observacional;
+   sin decisión sobre si entra al análisis.
+4. **Unidades:** falta confirmar formalmente moneda de `Revenue` y unidad de
+   `time_spent` (se asumió minutos en las figuras; por eso ninguna gráfica
+   lleva símbolo de moneda).
+5. **Figuras duplicadas:** conviven `experimento_relacion_tiempo_revenue.png`
+   (quiebre fijado a ojo, de `07_...R`) y
+   `experimento_relacion_tiempo_revenue_quiebre.png` (validada, de `09_...R`).
+   Falta decidir si se retira la primera.
+6. **Selección de figuras para la presentación:** varias (device_type,
+   os_type, sign_up) se hicieron como material exploratorio.
+7. **Entregable:** `04_Presentaciones/` y `08_Entregables/` están vacíos. No se
+   ha empezado la presentación al cliente.
 
 ## Reglas estrictas
 

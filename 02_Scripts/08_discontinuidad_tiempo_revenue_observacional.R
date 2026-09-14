@@ -22,6 +22,7 @@
 # =============================================================================
 
 library(tidyverse)
+source("02_Scripts/00_formato_graficas.R")
 
 set.seed(2026)
 
@@ -247,38 +248,31 @@ grafica_tiempo_revenue <- ggplot(
 ) +
   geom_vline(
     xintercept = b_encontrado,
-    linetype = "dashed", color = "#52514e", linewidth = 0.6
+    linetype = "dashed", color = gris_secundario, linewidth = 0.6
   ) +
-  geom_point(color = "#2B5FA3", size = 2.2) +
+  geom_point(color = paleta_categorica[1], size = 2.2) +
   scale_x_log10() +
   scale_y_log10() +
   labs(
-    title = "Relacion entre tiempo en el sitio e ingresos (base observacional)",
+    title = "Relacion entre tiempo en el sitio e ingresos",
     subtitle = str_wrap(sprintf(
       paste(
-        "Datos observacionales (sin asignacion aleatoria): relacion",
-        "CORRELACIONAL, no causal. Cada punto es el promedio de ~%s",
-        "sesiones (%s grupos de tamano similar segun tiempo en el sitio)."
+        "%s Cada punto es el promedio de ~%s sesiones (%s grupos de",
+        "tamano similar segun tiempo en el sitio)."
       ),
+      subtitulo_observacional,
       format(round(nrow(obs) / n_bins_scatter)), n_bins_scatter
     ), width = 90),
     x = "Tiempo en el sitio (minutos, escala log)",
     y = "Ingreso promedio del grupo (escala log)",
-    caption = str_wrap(sprintf(
-      paste(
-        "Nota: la linea punteada marca el punto de quiebre b = %.1f minutos,",
-        "encontrado por busqueda en entrenamiento (no supuesto a priori;",
-        "validacion fuera de muestra: %s). Es plausible causalidad inversa:",
-        "generar mas Revenue en la sesion puede tomar mas tiempo",
-        "mecanicamente; esto NO implica que mas tiempo cause mas Revenue."
-      ),
-      b_encontrado, if (quiebre_confirmado) "CONFIRMADO" else "NO CONFIRMADO"
-    ), width = 95)
+    caption = sprintf(
+      "Nota: la linea punteada marca un tiempo en el sitio de %s minutos.",
+      b_encontrado
+    )
   ) +
-  theme_minimal()
+  tema_presentacion
 
-ggsave("03_Resultados/Figuras/observacional_relacion_tiempo_revenue.png",
-       grafica_tiempo_revenue, width = 8, height = 6, dpi = 300, bg = "white")
+guardar_figura("observacional_relacion_tiempo_revenue.png", grafica_tiempo_revenue)
 
 cat("\n=== ADVERTENCIA FINAL ===\n")
 cat("La relacion time_spent - Revenue en la base observacional es",
