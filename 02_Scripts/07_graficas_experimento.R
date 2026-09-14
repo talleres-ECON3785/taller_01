@@ -7,22 +7,16 @@
 library(tidyverse)
 library(ggplot2)
 
+# paleta, tema, subtitulos por base y funcion de guardado: el formato de las
+# figuras vive en un solo lugar para que no se desincronice entre scripts
+source("02_Scripts/00_formato_graficas.R")
+
 experimento <- readRDS("01_Datos/03_Listos/experimento_listos.RDS")
 
 # todas las graficas de este script usan la base del experimento (prueba
 # A/B con asignacion aleatoria a easier_signup); se deja explicito en el
-# subtitulo de cada grafica para no confundirlas con la base observacional
-subtitulo_experimento <- "Datos del experimento A/B (asignacion aleatoria)."
-
-# paleta categorica sobria del proyecto: tonos desaturados de azul, ocre y
-# verde-azulado, validados para diferenciarse entre si (incluyendo daltonismo)
-# a pesar del bajo croma. Se reutiliza la misma terna en todas las graficas
-# de este script para mantener una identidad visual unica y consistente
-paleta_categorica <- c(
-  "#2B5FA3", # azul
-  "#B8863B", # ocre
-  "#0E8A6C"  # verde-azulado
-)
+# subtitulo de cada grafica (subtitulo_experimento) para no confundirlas con
+# la base observacional
 
 
 #------------------------------------------------------
@@ -58,25 +52,6 @@ resumen_ingresos_grupo <- experimento_grupo |>
     ci_superior = media + qt(0.975, n - 1) * error_estandar
   )
 
-# tema compartido por las graficas de esta seccion, para mantener la misma
-# estetica en todos los exports de la presentacion
-tema_presentacion <- theme_minimal(base_size = 13) +
-  theme(
-    plot.title = element_text(face = "bold", size = 16, color = "#0b0b0b"),
-    plot.subtitle = element_text(
-      color = "#52514e", size = 11, margin = margin(b = 10)
-    ),
-    plot.caption = element_text(
-      color = "#898781", size = 8.5, hjust = 0, margin = margin(t = 10)
-    ),
-    axis.text.x = element_text(size = 12, color = "#0b0b0b", face = "bold"),
-    axis.text.y = element_text(color = "#52514e"),
-    axis.title.y = element_text(color = "#52514e"),
-    panel.grid.major.x = element_blank(),
-    panel.grid.minor = element_blank(),
-    panel.grid.major.y = element_line(color = "#e1e0d9", linewidth = 0.4)
-  )
-
 grafica_ingresos_grupo <- ggplot(
   resumen_ingresos_grupo,
   aes(x = Grupo, y = media, fill = Grupo)
@@ -84,11 +59,11 @@ grafica_ingresos_grupo <- ggplot(
   geom_col(width = 0.5, show.legend = FALSE) +
   geom_errorbar(
     aes(ymin = ci_inferior, ymax = ci_superior),
-    width = 0.12, color = "#52514e", linewidth = 0.6
+    width = 0.12, color = gris_secundario, linewidth = 0.6
   ) +
   geom_text(
     aes(y = ci_superior, label = sprintf("%.2f", media)),
-    vjust = -1, color = "#0b0b0b", size = 4.5, fontface = "bold"
+    vjust = -1, color = gris_texto, size = 4.5, fontface = "bold"
   ) +
   scale_fill_manual(values = c(
     "Control" = color_control,
@@ -115,9 +90,9 @@ grafica_ingresos_grupo <- ggplot(
   ) +
   tema_presentacion
 
-ggsave(
-  "03_Resultados/Figuras/experimento_ingresos_promedio_control_tratamiento.png",
-  grafica_ingresos_grupo, width = 8, height = 6, dpi = 300, bg = "white"
+guardar_figura(
+  "experimento_ingresos_promedio_control_tratamiento.png",
+  grafica_ingresos_grupo
 )
 
 #grafica de distribucion: complementa la de medias mostrando que la mediana
@@ -148,7 +123,7 @@ grafica_distribucion_ingresos <- ggplot(
     data = resumen_ingresos_grupo,
     aes(xintercept = mediana),
     inherit.aes = FALSE, linetype = "dashed",
-    color = "#52514e", linewidth = 0.6
+    color = gris_secundario, linewidth = 0.6
   ) +
   scale_x_log10(breaks = c(1, 2, 5, 10, 20, 50)) +
   scale_fill_manual(values = c(
@@ -168,14 +143,11 @@ grafica_distribucion_ingresos <- ggplot(
     caption = paste(nota_n_grupo, nota_medianas_grupo, sep = "\n")
   ) +
   tema_presentacion +
-  theme(
-    strip.background = element_blank(),
-    strip.text = element_text(face = "bold", size = 12, color = "#0b0b0b")
-  )
+  tema_paneles
 
-ggsave(
-  "03_Resultados/Figuras/experimento_distribucion_ingresos_control_tratamiento.png",
-  grafica_distribucion_ingresos, width = 8, height = 6, dpi = 300, bg = "white"
+guardar_figura(
+  "experimento_distribucion_ingresos_control_tratamiento.png",
+  grafica_distribucion_ingresos
 )
 
 
@@ -233,7 +205,7 @@ grafica_densidad_revenue_device <- ggplot(
     data = resumen_ingresos_device,
     aes(xintercept = mediana),
     inherit.aes = FALSE, linetype = "dashed",
-    color = "#52514e", linewidth = 0.6
+    color = gris_secundario, linewidth = 0.6
   ) +
   scale_x_log10(breaks = c(1, 2, 5, 10, 20, 50)) +
   scale_fill_manual(values = color_device) +
@@ -247,15 +219,11 @@ grafica_densidad_revenue_device <- ggplot(
     caption = paste(nota_n_device, nota_medianas_device, sep = "\n")
   ) +
   tema_presentacion +
-  theme(
-    strip.background = element_blank(),
-    strip.text = element_text(face = "bold", size = 12, color = "#0b0b0b")
-  )
+  tema_paneles
 
-ggsave(
-  "03_Resultados/Figuras/experimento_distribucion_ingresos_device_type.png",
-  grafica_densidad_revenue_device,
-  width = 8, height = 6, dpi = 300, bg = "white"
+guardar_figura(
+  "experimento_distribucion_ingresos_device_type.png",
+  grafica_densidad_revenue_device
 )
 
 
@@ -306,7 +274,7 @@ grafica_densidad_revenue_os <- ggplot(
     data = resumen_ingresos_os,
     aes(xintercept = mediana),
     inherit.aes = FALSE, linetype = "dashed",
-    color = "#52514e", linewidth = 0.6
+    color = gris_secundario, linewidth = 0.6
   ) +
   scale_x_log10(breaks = c(1, 2, 5, 10, 20, 50)) +
   scale_fill_manual(values = color_os) +
@@ -320,15 +288,11 @@ grafica_densidad_revenue_os <- ggplot(
     caption = paste(nota_n_os, nota_medianas_os, sep = "\n")
   ) +
   tema_presentacion +
-  theme(
-    strip.background = element_blank(),
-    strip.text = element_text(face = "bold", size = 12, color = "#0b0b0b")
-  )
+  tema_paneles
 
-ggsave(
-  "03_Resultados/Figuras/experimento_distribucion_ingresos_os_type.png",
-  grafica_densidad_revenue_os,
-  width = 8, height = 6, dpi = 300, bg = "white"
+guardar_figura(
+  "experimento_distribucion_ingresos_os_type.png",
+  grafica_densidad_revenue_os
 )
 
 
@@ -377,7 +341,7 @@ grafica_densidad_revenue_signup <- ggplot(
     data = resumen_ingresos_signup,
     aes(xintercept = mediana),
     inherit.aes = FALSE, linetype = "dashed",
-    color = "#52514e", linewidth = 0.6
+    color = gris_secundario, linewidth = 0.6
   ) +
   scale_x_log10(breaks = c(1, 2, 5, 10, 20, 50)) +
   scale_fill_manual(values = color_signup) +
@@ -391,15 +355,11 @@ grafica_densidad_revenue_signup <- ggplot(
     caption = paste(nota_n_signup, nota_medianas_signup, sep = "\n")
   ) +
   tema_presentacion +
-  theme(
-    strip.background = element_blank(),
-    strip.text = element_text(face = "bold", size = 12, color = "#0b0b0b")
-  )
+  tema_paneles
 
-ggsave(
-  "03_Resultados/Figuras/experimento_distribucion_ingresos_signup.png",
-  grafica_densidad_revenue_signup,
-  width = 8, height = 6, dpi = 300, bg = "white"
+guardar_figura(
+  "experimento_distribucion_ingresos_signup.png",
+  grafica_densidad_revenue_signup
 )
 
 
@@ -435,7 +395,7 @@ grafica_tiempo_revenue <- ggplot(
 ) +
   geom_vline(
     xintercept = umbral_discontinuidad,
-    linetype = "dashed", color = "#52514e", linewidth = 0.6
+    linetype = "dashed", color = gris_secundario, linewidth = 0.6
   ) +
   geom_point(color = paleta_categorica[1], size = 2.2) +
   scale_x_log10() +
@@ -464,9 +424,9 @@ grafica_tiempo_revenue <- ggplot(
   ) +
   tema_presentacion
 
-ggsave(
-  "03_Resultados/Figuras/experimento_relacion_tiempo_revenue.png",
-  grafica_tiempo_revenue, width = 8, height = 6, dpi = 300, bg = "white"
+guardar_figura(
+  "experimento_relacion_tiempo_revenue.png",
+  grafica_tiempo_revenue
 )
 
 

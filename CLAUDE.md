@@ -62,6 +62,57 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
 - El flujo es Crudos, Procesados, Listos. Nunca en sentido inverso.
 - Reporte siempre cuántas observaciones se pierden al limpiar o filtrar.
 
+## Formato de las gráficas
+
+Todas las figuras del proyecto siguen un mismo formato, para que se vean como
+una sola familia al insertarlas en la presentación. El formato está definido en
+un único lugar, `02_Scripts/00_formato_graficas.R`; ese script no genera
+figuras, solo define paleta, tema y exportación.
+
+- **Regla:** cualquier script que produzca figuras debe empezar con
+  `source("02_Scripts/00_formato_graficas.R")` y usar lo que ahí se define.
+  No redefina colores, temas ni tamaños dentro de un script de análisis: si
+  algo del formato debe cambiar, cámbielo en `00_formato_graficas.R` para que
+  el cambio aplique a todas las figuras a la vez.
+- **Paleta:** `paleta_categorica`, terna sobria de azul (`#2B5FA3`), ocre
+  (`#B8863B`) y verde-azulado (`#0E8A6C`), distinguibles entre sí incluso con
+  daltonismo. Los grises (`gris_texto`, `gris_secundario`, `gris_nota`,
+  `gris_grilla`) son estructura, no categorías: se usan para texto, líneas de
+  referencia y grilla. Una misma categoría conserva su color entre bases (p.
+  ej. "No registrado" es azul y "Registrado" es ocre tanto en la base
+  observacional como en la del experimento), para poder leer dos figuras lado
+  a lado.
+- **Tema:** `tema_presentacion` (más `tema_paneles` si la gráfica usa facetas).
+- **Título:** describe qué muestra la figura, en español y sin tecnicismos del
+  código (no se nombran variables como `Revenue` o `sign_up`). La regla de
+  "el título comunica la conclusión" aplica a los títulos de las diapositivas,
+  no a los de las figuras.
+- **Subtítulo:** declara siempre de qué base viene la figura, usando
+  `subtitulo_experimento` o `subtitulo_observacional`. Esto es deliberado: las
+  dos bases no permiten afirmar lo mismo, y quien vea la figura suelta debe
+  poder saber si está viendo un efecto causal o una asociación descriptiva.
+- **Nota al pie (`caption`):** reporta el `n` de cada grupo y, cuando hay una
+  línea de referencia punteada, qué marca (normalmente la mediana del grupo).
+- **Convenciones:** los ejes van en español y con unidades explícitas
+  (p. ej. "Tiempo en el sitio en minutos", "Ingreso (escala log)"). Se prefieren
+  paneles (`facet_wrap`) sobre leyendas; cuando las categorías ya están en el
+  eje x o en los paneles, se omite la leyenda con `show.legend = FALSE`.
+- **Distribuciones:** se grafican como densidad continua (`geom_density`, con
+  `alpha = 0.55` y `linewidth = 0.8`), nunca como histograma, con un panel por
+  categoría y la mediana de cada grupo marcada con una línea punteada gris.
+  `Revenue` y `time_spent` tienen cola larga a la derecha, así que el eje x va
+  en escala logarítmica (los valores siguen en sus unidades originales; solo
+  cambia el espaciado del eje). Esto aplica a las dos bases, para que una
+  distribución observacional y una del experimento se puedan comparar sin
+  tener que reaprender cómo leer la figura.
+- **Nombres de archivo:** `03_Resultados/Figuras/<base>_<contenido>.png`, donde
+  `<base>` es `experimento` u `observacional` (p. ej.
+  `observacional_distribucion_ingresos_signup.png`). El prefijo permite saber
+  de un vistazo qué base sostiene cada figura.
+- **Exportación:** siempre con `guardar_figura()`, que fija 8×6 pulgadas,
+  300 dpi y fondo blanco explícito (ggplot lo deja transparente por defecto y
+  eso se ve mal sobre una diapositiva).
+
 ## Primero el diseño, después los resultados
 
 - No emita juicios sobre si un resultado es "bueno" o "malo".

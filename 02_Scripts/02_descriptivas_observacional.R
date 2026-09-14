@@ -14,6 +14,9 @@
 
 library(tidyverse)
 
+# paleta, tema, subtitulos por base y funcion de guardado de las figuras
+source("02_Scripts/00_formato_graficas.R")
+
 set.seed(2026)
 
 obs <- readRDS("01_Datos/02_Procesados/observacional_limpio.Rds")
@@ -123,52 +126,169 @@ write_csv(matriz_correlacion_df, "03_Resultados/Tablas/matriz_correlacion.csv")
 # 4. Figuras: Revenue y time_spent por sign_up
 # -----------------------------------------------------------------------------
 
+# las figuras siguen el formato compartido del proyecto (paleta, tema y
+# parametros de exportacion definidos en '00_formato_graficas.R'), el mismo
+# que usan las graficas del experimento. Se mantiene el mismo color por
+# categoria en ambas bases (No registrado = azul, Registrado = ocre) para
+# que las figuras de las dos fuentes se puedan leer una al lado de la otra
+
 obs_fig <- obs |>
-  mutate(sign_up_lab = if_else(sign_up == 1, "Registrado", "No registrado"))
+  mutate(Registro = factor(sign_up,
+    levels = c(0, 1),
+    labels = c("No registrado", "Registrado")
+  ))
 
-hist_revenue <- ggplot(obs_fig, aes(x = Revenue, fill = sign_up_lab)) +
-  geom_histogram(position = "identity", alpha = 0.5, bins = 40) +
-  labs(
-    title = "Distribucion de Revenue por sign_up (descriptivo, no causal)",
-    x = "Revenue", y = "Frecuencia", fill = "sign_up"
+color_registro <- c(
+  "No registrado" = paleta_categorica[1],
+  "Registrado"    = paleta_categorica[2]
+)
+
+resumen_registro <- obs_fig |>
+  group_by(Registro) |>
+  summarise(
+    n = n(),
+    mediana_revenue = median(Revenue),
+    mediana_time_spent = median(time_spent),
+    .groups = "drop"
+  )
+
+# la nota de tamano de muestra es la misma para las cuatro figuras
+nota_n_registro <- sprintf(
+  "Nota: n = %s (No registrado), %s (Registrado).",
+  format(resumen_registro$n[1], big.mark = ","),
+  format(resumen_registro$n[2], big.mark = ",")
+)
+
+# se grafica la densidad (distribucion continua) y no un histograma, igual que
+# en las graficas del experimento: asi las distribuciones de las dos bases se
+# leen con la misma convencion. Se usan paneles (uno por grupo) en vez de
+# leyenda porque las dos distribuciones superpuestas se distinguen mal.
+# Ambas variables tienen cola larga a la derecha, por lo que el eje x va en
+# escala logaritmica (misma decision que en el experimento); los ejes
+# mantienen las unidades originales
+densidad_revenue <- ggplot(
+  obs_fig,
+  aes(x = Revenue, fill = Registro, color = Registro)
+) +
+  geom_density(alpha = 0.55, linewidth = 0.8, show.legend = FALSE) +
+  geom_vline(
+    data = resumen_registro,
+    aes(xintercept = mediana_revenue),
+    inherit.aes = FALSE, linetype = "dashed",
+    color = gris_secundario, linewidth = 0.6
   ) +
-  theme_minimal()
-
-ggsave("03_Resultados/Figuras/histograma_revenue_por_sign_up.png",
-       hist_revenue, width = 8, height = 5)
-
-hist_time_spent <- ggplot(obs_fig, aes(x = time_spent, fill = sign_up_lab)) +
-  geom_histogram(position = "identity", alpha = 0.5, bins = 40) +
+  scale_x_log10(breaks = c(1, 2, 5, 10, 20, 50)) +
+  scale_fill_manual(values = color_registro) +
+  scale_color_manual(values = color_registro) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  facet_wrap(vars(Registro), ncol = 1) +
   labs(
-    title = "Distribucion de time_spent por sign_up (descriptivo, no causal)",
-    x = "time_spent", y = "Frecuencia", fill = "sign_up"
+    title = "Distribucion de ingresos por estado de registro",
+    subtitle = subtitulo_observacional,
+    x = "Ingreso (escala log)", y = "Densidad",
+    caption = paste(
+      nota_n_registro,
+      sprintf(
+        paste(
+          "La linea punteada marca la mediana de ingreso por estado de",
+          "registro: No registrado %.2f, Registrado %.2f."
+        ),
+        resumen_registro$mediana_revenue[1],
+        resumen_registro$mediana_revenue[2]
+      ),
+      sep = "\n"
+    )
   ) +
-  theme_minimal()
+  tema_presentacion +
+  tema_paneles
 
-ggsave("03_Resultados/Figuras/histograma_time_spent_por_sign_up.png",
-       hist_time_spent, width = 8, height = 5)
+guardar_figura(
+  "observacional_distribucion_ingresos_signup.png",
+  densidad_revenue
+)
 
-box_revenue <- ggplot(obs_fig, aes(x = sign_up_lab, y = Revenue, fill = sign_up_lab)) +
-  geom_boxplot() +
+# time_spent llega hasta valores de 0.0001 minutos, casi cinco ordenes de
+# magnitud por debajo de la mediana, asi que los cortes del eje cubren un
+# rango mas amplio que los de la grafica de ingresos
+densidad_time_spent <- ggplot(
+  obs_fig,
+  aes(x = time_spent, fill = Registro, color = Registro)
+) +
+  geom_density(alpha = 0.55, linewidth = 0.8, show.legend = FALSE) +
+  geom_vline(
+    data = resumen_registro,
+    aes(xintercept = mediana_time_spent),
+    inherit.aes = FALSE, linetype = "dashed",
+    color = gris_secundario, linewidth = 0.6
+  ) +
+  # las etiquetas se escriben explicitas para evitar que R las muestre en
+  # notacion cientifica (1e-03), que rompe la convencion del resto de figuras
+  scale_x_log10(
+    breaks = c(0.001, 0.01, 0.1, 1, 10, 50),
+    labels = c("0.001", "0.01", "0.1", "1", "10", "50")
+  ) +
+  scale_fill_manual(values = color_registro) +
+  scale_color_manual(values = color_registro) +
+  scale_y_continuous(expand = expansion(mult = c(0, 0.1))) +
+  facet_wrap(vars(Registro), ncol = 1) +
   labs(
-    title = "Revenue por sign_up (descriptivo, no causal)",
-    x = NULL, y = "Revenue", fill = "sign_up"
+    title = "Distribucion del tiempo en el sitio por estado de registro",
+    subtitle = subtitulo_observacional,
+    x = "Tiempo en el sitio en minutos (escala log)", y = "Densidad",
+    caption = paste(
+      nota_n_registro,
+      sprintf(
+        paste(
+          "La linea punteada marca la mediana de tiempo en el sitio por",
+          "estado de registro: No registrado %.2f, Registrado %.2f."
+        ),
+        resumen_registro$mediana_time_spent[1],
+        resumen_registro$mediana_time_spent[2]
+      ),
+      sep = "\n"
+    )
   ) +
-  theme_minimal()
+  tema_presentacion +
+  tema_paneles
 
-ggsave("03_Resultados/Figuras/boxplot_revenue_por_sign_up.png",
-       box_revenue, width = 8, height = 5)
+guardar_figura(
+  "observacional_distribucion_tiempo_signup.png",
+  densidad_time_spent
+)
 
-box_time_spent <- ggplot(obs_fig, aes(x = sign_up_lab, y = time_spent, fill = sign_up_lab)) +
-  geom_boxplot() +
+# en los boxplot las categorias ya estan en el eje x, asi que la leyenda seria
+# redundante (misma convencion que las graficas del experimento)
+box_revenue <- ggplot(
+  obs_fig,
+  aes(x = Registro, y = Revenue, fill = Registro)
+) +
+  geom_boxplot(width = 0.5, outlier.alpha = 0.15, show.legend = FALSE) +
+  scale_fill_manual(values = color_registro) +
   labs(
-    title = "time_spent por sign_up (descriptivo, no causal)",
-    x = NULL, y = "time_spent", fill = "sign_up"
+    title = "Ingresos por estado de registro",
+    subtitle = subtitulo_observacional,
+    x = NULL, y = "Ingreso",
+    caption = nota_n_registro
   ) +
-  theme_minimal()
+  tema_presentacion
 
-ggsave("03_Resultados/Figuras/boxplot_time_spent_por_sign_up.png",
-       box_time_spent, width = 8, height = 5)
+guardar_figura("observacional_ingresos_signup.png", box_revenue)
+
+box_time_spent <- ggplot(
+  obs_fig,
+  aes(x = Registro, y = time_spent, fill = Registro)
+) +
+  geom_boxplot(width = 0.5, outlier.alpha = 0.15, show.legend = FALSE) +
+  scale_fill_manual(values = color_registro) +
+  labs(
+    title = "Tiempo en el sitio por estado de registro",
+    subtitle = subtitulo_observacional,
+    x = NULL, y = "Tiempo en el sitio en minutos",
+    caption = nota_n_registro
+  ) +
+  tema_presentacion
+
+guardar_figura("observacional_tiempo_signup.png", box_time_spent)
 
 cat("\nListo. Tablas guardadas en 03_Resultados/Tablas/ y figuras en 03_Resultados/Figuras/.\n")
 cat("Recordatorio: las diferencias por sign_up reportadas aqui son descriptivas,\n")
