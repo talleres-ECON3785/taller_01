@@ -16,7 +16,9 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
   qué no, y en no confundir correlación (datos históricos) con efecto causal
   (experimento).
 - **Entregable final:** una presentación al cliente en `08_Entregables/`, sin
-  código, estilo *answer-first* (ver sección "Entregable: presentación al cliente").
+  código, estilo *answer-first* (ver sección "Entregable: presentación al
+  cliente"). Ya está publicada en `08_Entregables/CheMarket_deck.pdf`, con el
+  video en `08_Entregables/link_video.md`.
 
 ## Estructura del proyecto
 
@@ -42,7 +44,24 @@ de los Andes). Cliente ficticio: CheMarket Inc., empresa de comercio electrónic
 - Evalúe el desempeño predictivo siempre fuera de muestra (train/test), nunca
   dentro de muestra.
 - Al cerrar una sesión, escriba una bitácora en `06_Bitacoras/` con lo que se
-  hizo, por qué, qué se descubrió y qué problemas se presentaron.
+  hizo, por qué, qué se descubrió y qué problemas se presentaron (ver skill
+  `cerrar-sesion` abajo).
+
+## Skill de Claude Code: `cerrar-sesion`
+
+Definida en `.claude/skills/cerrar-sesion/SKILL.md`. Se invoca al terminar una
+sesión de trabajo (pidiendo "cerrar sesión", "escribir la bitácora" o
+"guardar la conversación") y hace dos cosas, en orden:
+
+1. Escribe la bitácora de la sesión en `06_Bitacoras/`, replicando el formato
+   de las bitácoras existentes (encabezados: Qué se hizo, Por qué, Qué se
+   descubrió, Problemas/pendientes).
+2. Copia el registro crudo (`.jsonl`) de la conversación a una carpeta fuera
+   del repo (`Conversaciones_Claude/`, un nivel arriba de `taller1/`), nunca
+   versionada con git.
+
+Si algo no es inferible con certeza (p. ej. quién de los integrantes trabajó
+en la sesión), la skill pregunta al usuario en vez de adivinar.
 
 ## Regla metodológica: solo regresión lineal
 
@@ -137,43 +156,43 @@ figuras, solo define paleta, tema y exportación.
 <!-- Registro acumulado de decisiones metodológicas y su justificación, para no
      perder de vista por qué se hizo algo varias semanas después. -->
 
-| Fecha      | Decisión                                                                                                                                                                              | Justificación                                                                                                                                   |
-| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
-| 2026-09-12 | El estimando central del experimento es el ITT de`easier_signup` sobre `Revenue`; el efecto sobre `sign_up` (primer estadio) se reporta como mecanismo, no como respuesta final. | `easier_signup` es la variable que CheMarket puede manipular directamente; `sign_up` es un resultado intermedio, no la palanca de política. |
+| Fecha      | Decisión                                                                                                                                                                              | Justificación                                                                                                                                                                             |
+| ---------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| 2026-09-12 | El estimando central del experimento es el ITT de`easier_signup` sobre `Revenue`; el efecto sobre `sign_up` (primer estadio) se reporta como mecanismo, no como respuesta final. | `easier_signup` es la variable que CheMarket puede manipular directamente; `sign_up` es un resultado intermedio, no la palanca de política.                                           |
+| 2026-09-13 | `time_spent` está en minutos, en las dos bases.                                                                                                                                     | La base no trae metadatos de unidades; por los rangos observados minutos es lo plausible, y el usuario confirmó la lectura durante la sesión de migración de gráficas del experimento. |
 
 ## Análisis descartados
 
 <!-- Especificaciones, variables o enfoques que se probaron y abandonaron, con
      la razón, para no repetir procedimientos ya infructuosos. -->
 
-| Fecha      | Análisis/especificación descartada                                                                                  | Razón                                                                                                                                                                                                                     |
-| ---------- | -------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| 2026-09-13 | Hipótesis de sesgo de variable omitida en `itt_sencillo` por `time_spent` (se estimó `log_time_spent ~ easier_signup`) | El coeficiente es positivo y no estadísticamente significativo: no hay evidencia de que `easier_signup` afecte `time_spent`, así que no sostiene la hipótesis de que `time_spent` fuera un mediador/mal control del ITT. |
-| 2026-09-13 | Profundizar en IV/LATE usando `easier_signup` como instrumento de `sign_up`                                          | El primer estadio (`sign_up ~ easier_signup`) tiene coeficiente exactamente 1, por la correspondencia perfecta entre `sign_up` y `easier_signup` (ver tabla de contingencia, sección 1 de `06_analisis_experimento.R`). Por lo tanto LATE = ITT / 1 = ITT: no aporta información adicional a la ya obtenida con el ITT. |
+| Fecha      | Análisis/especificación descartada                                                                                          | Razón                                                                                                                                                                                                                                                                                                                            |
+| ---------- | ----------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| 2026-09-13 | Hipótesis de sesgo de variable omitida en`itt_sencillo` por `time_spent` (se estimó `log_time_spent ~ easier_signup`) | El coeficiente es positivo y no estadísticamente significativo: no hay evidencia de que`easier_signup` afecte `time_spent`, así que no sostiene la hipótesis de que `time_spent` fuera un mediador/mal control del ITT.                                                                                                  |
+| 2026-09-13 | Profundizar en IV/LATE usando`easier_signup` como instrumento de `sign_up`                                                | El primer estadio (`sign_up ~ easier_signup`) tiene coeficiente exactamente 1, por la correspondencia perfecta entre `sign_up` y `easier_signup` (ver tabla de contingencia, sección 1 de `06_analisis_experimento.R`). Por lo tanto LATE = ITT / 1 = ITT: no aporta información adicional a la ya obtenida con el ITT. |
 
 ## Definición de variables
 
 <!-- Definición operativa de cada variable usada en el análisis: qué incluye,
      unidades, moneda, período y fuente. -->
 
-Definiciones tal como las da el enunciado del taller. Pendiente confirmar al
-explorar los datos: unidades y moneda de `Revenue` (¿incluye impuestos?),
-período/duración de "la sesión", y si `time_spent` está en segundos o minutos.
+Definiciones tal como las da el enunciado del taller, con las unidades ya
+confirmadas al explorar los datos.
 
-| Variable              | Definición                                                                                                                                                                                                                                                                                       | Fuente                                                   |
-| --------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
-| `Revenue`           | Gasto del usuario en la sesión.                                                                                                                                                                                                                                                                 | `observacional.Rds`, `experimento.Rds`               |
-| `sign_up`           | Si el usuario se registró (binaria).                                                                                                                                                                                                                                                             | `observacional.Rds`, `experimento.Rds`               |
-| `time_spent`        | Tiempo en el sitio en la sesión.                                                                                                                                                                                                                                                                 | `observacional.Rds`, `experimento.Rds`               |
-| `past_sessions`     | Número de sesiones anteriores.                                                                                                                                                                                                                                                                   | `observacional.Rds`, `experimento.Rds`               |
-| `device_type`       | Dispositivo usado:`mobile`, `desktop` o `tablet`.                                                                                                                                                                                                                                           | `observacional.Rds`, `experimento.Rds`               |
-| `is_returning_user` | Si el usuario ya había visitado antes (binaria).                                                                                                                                                                                                                                                 | `observacional.Rds`, `experimento.Rds`               |
-| `easier_signup`     | Asignación al tratamiento del experimento (registro facilitado, binaria).                                                                                                                                                                                                                        | `experimento.Rds` (no existe en `observacional.Rds`) |
-| `os_type`           | Sistema operativo:`osx`, `windows` u `other`. No estaba en el enunciado original; se encontró al explorar `datos_historicos.Rds` (2026-09-12). No se limpió ni describió en la sesión de limpieza/descriptivas de `observacional.Rds`; pendiente decidir si se usa en el análisis. | `observacional.Rds`, `experimento.Rds`               |
+| Variable              | Definición                                                                                                                                                                                                                                                                                                                                                                  | Fuente                                                   |
+| --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------- |
+| `Revenue`           | Gasto del usuario en la sesión.                                                                                                                                                                                                                                                                                                                                             | `observacional.Rds`, `experimento.Rds`               |
+| `sign_up`           | Si el usuario se registró (binaria).                                                                                                                                                                                                                                                                                                                                        | `observacional.Rds`, `experimento.Rds`               |
+| `time_spent`        | Tiempo en el sitio en la sesión, en minutos.                                                                                                                                                                                                                                                                                                                                | `observacional.Rds`, `experimento.Rds`               |
+| `past_sessions`     | Número de sesiones anteriores.                                                                                                                                                                                                                                                                                                                                              | `observacional.Rds`, `experimento.Rds`               |
+| `device_type`       | Dispositivo usado:`mobile`, `desktop` o `tablet`.                                                                                                                                                                                                                                                                                                                      | `observacional.Rds`, `experimento.Rds`               |
+| `is_returning_user` | Si el usuario ya había visitado antes (binaria).                                                                                                                                                                                                                                                                                                                            | `observacional.Rds`, `experimento.Rds`               |
+| `easier_signup`     | Asignación al tratamiento del experimento (registro facilitado, binaria).                                                                                                                                                                                                                                                                                                   | `experimento.Rds` (no existe en `observacional.Rds`) |
+| `os_type`           | Sistema operativo:`osx`, `windows` u `other`. No estaba en el enunciado original; se encontró al explorar `datos_historicos.Rds` (2026-09-12). No se limpió ni describió univariadamente en la sesión de descriptivas de `observacional.Rds`, pero sí se usa como control en las regresiones correlacional (10), predictiva (11) y de representatividad (12). | `observacional.Rds`, `experimento.Rds`               |
 
 **Nota (2026-09-12):** los archivos crudos reales se llaman `datos_historicos.Rds`
 (observacional) y `datos_experimento.Rds`, no `observacional.Rds`/`experimento.Rds`
-como dice el enunciado citado arriba. 
+como dice el enunciado citado arriba.
 
 ## Restricciones de muestra
 
@@ -212,13 +231,14 @@ como dice el enunciado citado arriba.
 - Los dos archivos crudos están en `01_Datos/01_Crudos/`, con nombres distintos
   a los del enunciado: `datos_historicos.Rds` (observacional, 100,000 obs.) y
   `datos_experimento.Rds` (experimento, 10,000 obs.).
-- Base observacional limpia: `01_Datos/02_Procesados/observacional_limpio.Rds`
+- Base observacional lista: `01_Datos/03_Listos/observacional_limpio.Rds`
   (100,000 obs.; la limpieza no pierde observaciones, ver
-  `03_Resultados/Tablas/reporte_calidad_observacional_embudo.csv`).
+  `03_Resultados/Tablas/reporte_calidad_observacional_embudo.csv`). El script
+  `01_limpieza_observacional.R` la guarda directamente en `03_Listos/`; todos
+  los scripts que la usan (02, 08, 10, 11, 12) leen de ahí. `02_Procesados/`
+  queda vacía (solo `.gitkeep`) para transformaciones intermedias futuras.
 - Base del experimento lista: `01_Datos/03_Listos/experimento_listos.RDS`
   (10,000 obs.; tampoco se pierden observaciones por NA).
-- Pendiente: la base observacional no tiene todavía una versión en
-  `01_Datos/03_Listos/`; los scripts 02 y 08 leen directamente de Procesados.
 
 ### Pipeline
 
@@ -226,22 +246,23 @@ como dice el enunciado citado arriba.
 ejecución, cada script en su propio entorno, verificando antes que el
 directorio de trabajo sea la raíz. Scripts en `02_Scripts/`:
 
-| Script | Qué hace |
-| --- | --- |
-| `00_formato_graficas.R` | Paleta, tema y `guardar_figura()`. No genera figuras; lo cargan con `source()` los scripts que sí. |
-| `01_limpieza_observacional.R` | Limpia `datos_historicos.Rds` y reporta calidad. |
-| `02_descriptivas_observacional.R` | Univariadas, descriptivas por `sign_up`, correlaciones y 4 figuras. |
-| `03_procesar_datos_experimento.R` | Procesa `datos_experimento.Rds` → `experimento_listos.RDS`. |
-| `04_descriptivas_experimento.R` | Descriptivas de la base del experimento. |
-| `05_balance_experimento.R` | Balance de covariables entre control y tratamiento. |
-| `06_analisis_experimento.R` | Contingencia `sign_up` x `easier_signup`, ITT y chequeos de especificación. |
-| `07_graficas_experimento.R` | Seis figuras del experimento para la presentación. |
-| `08_discontinuidad_tiempo_revenue_observacional.R` | Búsqueda formal del quiebre `time_spent`–`Revenue` con validación fuera de muestra. |
-| `09_discontinuidad_tiempo_revenue_experimento.R` | Lo mismo en el experimento, más la comparación entre bases. |
+| Script                                               | Qué hace                                                                                                 |
+| ---------------------------------------------------- | --------------------------------------------------------------------------------------------------------- |
+| `00_formato_graficas.R`                            | Paleta, tema y`guardar_figura()`. No genera figuras; lo cargan con `source()` los scripts que sí.    |
+| `01_limpieza_observacional.R`                      | Limpia`datos_historicos.Rds` y reporta calidad.                                                         |
+| `02_descriptivas_observacional.R`                  | Univariadas, descriptivas por`sign_up`, correlaciones y 4 figuras.                                      |
+| `03_procesar_datos_experimento.R`                  | Procesa`datos_experimento.Rds` → `experimento_listos.RDS`.                                           |
+| `04_descriptivas_experimento.R`                    | Descriptivas de la base del experimento.                                                                  |
+| `05_balance_experimento.R`                         | Balance de covariables entre control y tratamiento.                                                       |
+| `06_analisis_experimento.R`                        | Contingencia`sign_up` x `easier_signup`, ITT y chequeos de especificación.                           |
+| `07_graficas_experimento.R`                        | Seis figuras del experimento para la presentación.                                                       |
+| `08_discontinuidad_tiempo_revenue_observacional.R` | Búsqueda formal del quiebre`time_spent`–`Revenue` con validación fuera de muestra.                 |
+| `09_discontinuidad_tiempo_revenue_experimento.R`   | Lo mismo en el experimento, más la comparación entre bases.                                             |
+| `10_regresion_correlacional_observacional.R`       | Asociación (correlacional) entre`sign_up`, `time_spent` y `log(Revenue)` en la base observacional. |
+| `11_prediccion_revenue_observacional.R`            | Modelo predictivo de`Revenue` con regresión lineal, evaluado fuera de muestra (train/test 80/20).      |
+| `12_representatividad_experimento_vs_historico.R`  | Compara la muestra del experimento contra la población histórica para evaluar si el ITT generaliza.     |
 
-- **Pendiente:** `00_main.R` todavía lista solo los scripts 01–07 (su mensaje
-  final dice "los 7 scripts"); los scripts 08 y 09 se agregaron después y no
-  están incluidos, así que hoy hay que correrlos aparte.
+- `00_main.R` corre los 12 scripts en orden en una sola ejecución.
 - Ningún script verifica que sus archivos de entrada existan antes de leerlos.
 
 ### Resultados ya obtenidos
@@ -263,30 +284,29 @@ directorio de trabajo sea la raíz. Scripts en `02_Scripts/`:
   **correlacional, no causal**, en las dos bases: `time_spent` no está
   aleatorizado y es plausible causalidad inversa
   (`comparacion_quiebre_observacional_experimento.csv`).
-- En `03_Resultados/` hay 14 figuras y 24 tablas, todas regenerables desde los
+- **Asociación `sign_up`–`log(Revenue)` en la base observacional**
+  (correlacional, no causal): coeficiente 0.102 sin controles, 0.080 con
+  controles observables, 0.047 al agregar `log(time_spent)`; significativo en
+  los tres casos (`10_regresion_correlacional_observacional.R`).
+- **Elasticidad `Revenue`–`time_spent`** en la base observacional: ≈0.169% de
+  cambio en `Revenue` por 1% de cambio en `time_spent`, estable entre el
+  modelo simple y el modelo con controles, significativa en ambos
+  (`tabla_elasticidad_timespent_observacional.csv`).
+- **Modelo predictivo de `Revenue`** (regresión lineal, evaluado fuera de
+  muestra, 80,000/20,000): RMSE 2.314 vs. 2.716 de la referencia ingenua
+  (media de entrenamiento), mejora de 14.8% en RMSE
+  (`desempeno_predictivo_observacional.csv`).
+- **Representatividad de la muestra del experimento** frente a la población
+  histórica: test conjunto F=0.65 (p=0.712) y diferencias de magnitud
+  pequeñas en todas las características observables compartidas
+  (`representatividad_experimento_vs_historico.xlsx`); es decir, no hay
+  evidencia de que la muestra del experimento sea distinta de la población
+  histórica en esas características.
+- En `03_Resultados/` hay 14 figuras y 26 tablas, todas regenerables desde los
   scripts.
-
-### Pendientes abiertos
-
-1. **Decidir el estimando central que se reporta:** el ITT es significativo en
-   nivel y no en logaritmo. Falta acordar cuál se presenta y cómo se comunica
-   la discrepancia sin sobre-interpretar ninguno de los dos.
-2. **Valores atípicos** de `Revenue`, `time_spent` y `past_sessions` en la base
-   observacional: sin decisión del equipo (ver
-   `reporte_calidad_observacional.csv`).
-3. **`os_type`**: sigue sin limpiarse ni describirse en la base observacional;
-   sin decisión sobre si entra al análisis.
-4. **Unidades:** falta confirmar formalmente moneda de `Revenue` y unidad de
-   `time_spent` (se asumió minutos en las figuras; por eso ninguna gráfica
-   lleva símbolo de moneda).
-5. **Figuras duplicadas:** conviven `experimento_relacion_tiempo_revenue.png`
-   (quiebre fijado a ojo, de `07_...R`) y
-   `experimento_relacion_tiempo_revenue_quiebre.png` (validada, de `09_...R`).
-   Falta decidir si se retira la primera.
-6. **Selección de figuras para la presentación:** varias (device_type,
-   os_type, sign_up) se hicieron como material exploratorio.
-7. **Entregable:** `04_Presentaciones/` y `08_Entregables/` están vacíos. No se
-   ha empezado la presentación al cliente.
+- La presentación final para CheMarket ya está en
+  `08_Entregables/CheMarket_deck.pdf`, con el link al video en
+  `08_Entregables/link_video.md`.
 
 ## Reglas estrictas
 

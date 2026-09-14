@@ -2,7 +2,7 @@
 # Script maestro: ejecuta todo el pipeline del Taller 1 en una sola corrida
 # Taller 1 - ECON-3785
 #
-# Corre los scripts de 02_Scripts/ en el orden de su numeracion (01 a 07).
+# Corre los scripts de 02_Scripts/ en el orden de su numeracion (01 a 12).
 # Cada script asume que el directorio de trabajo es la raiz del proyecto
 # (donde vive taller1.Rproj), por eso este script verifica esa raiz antes
 # de sourcear nada y no cambia el working directory de cada script.
@@ -30,7 +30,12 @@ scripts <- c(
   "02_Scripts/04_descriptivas_experimento.R",
   "02_Scripts/05_balance_experimento.R",
   "02_Scripts/06_analisis_experimento.R",
-  "02_Scripts/07_graficas_experimento.R"
+  "02_Scripts/07_graficas_experimento.R",
+  "02_Scripts/08_discontinuidad_tiempo_revenue_observacional.R",
+  "02_Scripts/09_discontinuidad_tiempo_revenue_experimento.R",
+  "02_Scripts/10_regresion_correlacional_observacional.R",
+  "02_Scripts/11_prediccion_revenue_observacional.R",
+  "02_Scripts/12_representatividad_experimento_vs_historico.R"
 )
 
 # nota: '00_formato_graficas.R' no aparece en esta lista porque no produce
@@ -50,4 +55,4 @@ for (script in scripts) {
   source(script, local = new.env(), encoding = "UTF-8")
 }
 
-message("Pipeline completo: los 7 scripts se ejecutaron sin errores.")
+message("Pipeline completo: los 12 scripts se ejecutaron sin errores.")

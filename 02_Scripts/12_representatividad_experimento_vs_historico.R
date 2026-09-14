@@ -24,7 +24,7 @@ library(writexl)
 # 1. Cargar y combinar las dos bases limpias (nunca las crudas)
 # -----------------------------------------------------------------------------
 
-obs <- readRDS("01_Datos/02_Procesados/observacional_limpio.Rds")
+obs <- readRDS("01_Datos/03_Listos/observacional_limpio.Rds")
 exp <- readRDS("01_Datos/03_Listos/experimento_listos.RDS")
 
 # variables que comparten ambas bases ('easier_signup' solo existe en el

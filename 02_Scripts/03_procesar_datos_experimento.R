@@ -2,7 +2,7 @@
 #y realiza limpieza y verificaciones para asegurar que esta listo para
 #utilizarse en analisis. Guarda el resultado en 03_Listos.
 
-require(tidyverse)
+library(tidyverse)
 
 
 data_experimento <- readRDS("01_Datos/01_Crudos/datos_experimento.Rds")

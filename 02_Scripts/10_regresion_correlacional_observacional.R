@@ -26,7 +26,7 @@ library(modelsummary)
 # -----------------------------------------------------------------------------
 
 obs <- readRDS(
-  "01_Datos/02_Procesados/observacional_limpio.Rds"
+  "01_Datos/03_Listos/observacional_limpio.Rds"
 )
 
 dim(obs)

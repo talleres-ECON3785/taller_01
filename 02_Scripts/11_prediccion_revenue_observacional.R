@@ -17,7 +17,7 @@ library(tidyverse)
 
 set.seed(2026)
 
-obs <- readRDS("01_Datos/02_Procesados/observacional_limpio.Rds")
+obs <- readRDS("01_Datos/03_Listos/observacional_limpio.Rds")
 
 # -----------------------------------------------------------------------------
 # 1. Particion train/test (80/20), semilla 2026

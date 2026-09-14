@@ -270,10 +270,10 @@ cat("\n=== Tabla de embudo de observaciones ===\n")
 print(embudo)
 
 # -----------------------------------------------------------------------------
-# 7. Guardar base procesada
+# 7. Guardar base lista para analisis
 # -----------------------------------------------------------------------------
 
-saveRDS(obs_final, "01_Datos/02_Procesados/observacional_limpio.Rds")
+saveRDS(obs_final, "01_Datos/03_Listos/observacional_limpio.Rds")
 
 # -----------------------------------------------------------------------------
 # 8. Guardar reporte de calidad de datos
@@ -300,5 +300,5 @@ reporte_hallazgos <- hallazgos |>
 write_csv(reporte_embudo, "03_Resultados/Tablas/reporte_calidad_observacional_embudo.csv")
 write_csv(reporte_hallazgos, "03_Resultados/Tablas/reporte_calidad_observacional.csv")
 
-cat("\nListo. Base limpia guardada en 01_Datos/02_Procesados/observacional_limpio.Rds\n")
+cat("\nListo. Base limpia guardada en 01_Datos/03_Listos/observacional_limpio.Rds\n")
 cat("Reportes guardados en 03_Resultados/Tablas/reporte_calidad_observacional*.csv\n")
