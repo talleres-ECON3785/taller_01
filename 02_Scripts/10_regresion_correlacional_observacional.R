@@ -151,6 +151,7 @@ etiquetas_log <- c(
   "(Intercept)" = "Intercepto"
 )
 
+# se muestra en pantalla para revisar antes de exportar
 modelsummary(
   modelos_log,
   coef_map = etiquetas_log,
@@ -160,6 +161,21 @@ modelsummary(
     "Asociacion entre registro y log(Revenue) en datos historicos",
     "(correlacional, no causal)"
   )
+)
+
+# version en archivo: al correr el pipeline con Rscript (00_main.R) las tablas
+# que solo se imprimen en pantalla no quedan registradas en ningun lado, y
+# estos coeficientes se citan en la presentacion
+modelsummary(
+  modelos_log,
+  coef_map = etiquetas_log,
+  gof_map = c("nobs", "r.squared", "adj.r.squared"),
+  stars = c("*" = 0.10, "**" = 0.05, "***" = 0.01),
+  title = paste(
+    "Asociacion entre registro y log(Revenue) en datos historicos",
+    "(correlacional, no causal)"
+  ),
+  output = "03_Resultados/Tablas/tabla_correlacional_signup_observacional.docx"
 )
 
 
@@ -175,6 +191,79 @@ print(confint(modelo_log_controles)["sign_up", ])
 
 cat("\nIC 95% - Modelo incluyendo log(time_spent):\n")
 print(confint(modelo_log_tiempo)["sign_up", ])
+
+
+# -----------------------------------------------------------------------------
+# Asociacion en nivel (dolares por sesion)
+# -----------------------------------------------------------------------------
+#
+# Los modelos de arriba estan en log(Revenue) y se leen en porcentaje. La
+# presentacion al cliente reporta la brecha en dolares por sesion, asi que se
+# estiman aqui las mismas especificaciones en nivel y se exportan, para que
+# cada cifra citada tenga respaldo en un archivo.
+#
+# Igual que arriba: CORRELACIONAL, NO CAUSAL.
+#
+# Se incluyen dos variantes con tiempo en el sitio: con log(time_spent), que
+# es la que corre en paralelo al Modelo 3, y con time_spent en nivel. La
+# distincion importa porque cambia la magnitud del coeficiente, y time_spent
+# es justamente el control discutible (se mide en la misma sesion).
+
+modelos_nivel <- list(
+  "Asociacion simple" = lm(Revenue ~ sign_up, data = obs),
+  "Controles observables" = lm(
+    Revenue ~ sign_up + past_sessions + is_returning_user +
+      device_type + os_type,
+    data = obs
+  ),
+  "Controles + log(tiempo)" = lm(
+    Revenue ~ sign_up + log_time_spent + past_sessions + is_returning_user +
+      device_type + os_type,
+    data = obs
+  ),
+  "Controles + tiempo en nivel" = lm(
+    Revenue ~ sign_up + time_spent + past_sessions + is_returning_user +
+      device_type + os_type,
+    data = obs
+  )
+)
+
+# base de comparacion para expresar la brecha en porcentaje: el gasto promedio
+# de los usuarios NO registrados
+media_no_registrados <- mean(obs$Revenue[obs$sign_up == 0])
+
+tabla_asociacion_nivel <- tibble(
+  modelo = names(modelos_nivel),
+  coef_sign_up = vapply(
+    modelos_nivel, function(m) unname(coef(m)["sign_up"]), numeric(1)
+  ),
+  error_estandar = vapply(
+    modelos_nivel,
+    function(m) summary(m)$coefficients["sign_up", "Std. Error"],
+    numeric(1)
+  ),
+  p_valor = vapply(
+    modelos_nivel,
+    function(m) summary(m)$coefficients["sign_up", "Pr(>|t|)"],
+    numeric(1)
+  ),
+  r2 = vapply(modelos_nivel, function(m) summary(m)$r.squared, numeric(1)),
+  n = vapply(
+    modelos_nivel, function(m) length(residuals(m)), integer(1)
+  )
+) |>
+  mutate(
+    pct_sobre_media_no_registrados = 100 * coef_sign_up / media_no_registrados
+  )
+
+cat("\nGasto promedio de usuarios no registrados:",
+    round(media_no_registrados, 4), "\n")
+print(as.data.frame(tabla_asociacion_nivel))
+
+write_csv(
+  tabla_asociacion_nivel,
+  "03_Resultados/Tablas/tabla_asociacion_signup_nivel_observacional.csv"
+)
 
 
 # =============================================================================

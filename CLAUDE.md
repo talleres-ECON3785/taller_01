@@ -254,11 +254,11 @@ directorio de trabajo sea la raíz. Scripts en `02_Scripts/`:
 | `03_procesar_datos_experimento.R`                  | Procesa`datos_experimento.Rds` → `experimento_listos.RDS`.                                           |
 | `04_descriptivas_experimento.R`                    | Descriptivas de la base del experimento.                                                                  |
 | `05_balance_experimento.R`                         | Balance de covariables entre control y tratamiento.                                                       |
-| `06_analisis_experimento.R`                        | Contingencia`sign_up` x `easier_signup`, ITT y chequeos de especificación.                           |
+| `06_analisis_experimento.R`                        | Contingencia`sign_up` x `easier_signup`, ITT (en log y en nivel) y chequeos de especificación.                           |
 | `07_graficas_experimento.R`                        | Seis figuras del experimento para la presentación.                                                       |
 | `08_discontinuidad_tiempo_revenue_observacional.R` | Búsqueda formal del quiebre`time_spent`–`Revenue` con validación fuera de muestra.                 |
 | `09_discontinuidad_tiempo_revenue_experimento.R`   | Lo mismo en el experimento, más la comparación entre bases.                                             |
-| `10_regresion_correlacional_observacional.R`       | Asociación (correlacional) entre`sign_up`, `time_spent` y `log(Revenue)` en la base observacional. |
+| `10_regresion_correlacional_observacional.R`       | Asociación (correlacional) entre`sign_up`, `time_spent` y `Revenue` (en log y en nivel) en la base observacional. |
 | `11_prediccion_revenue_observacional.R`            | Modelo predictivo de`Revenue` con regresión lineal, evaluado fuera de muestra (train/test 80/20).      |
 | `12_representatividad_experimento_vs_historico.R`  | Compara la muestra del experimento contra la población histórica para evaluar si el ITT generaliza.     |
 
@@ -276,7 +276,9 @@ directorio de trabajo sea la raíz. Scripts en `02_Scripts/`:
   (`tabla_itt_experimento.docx`).
 - **ITT sobre `Revenue` en nivel:** coeficiente 0.49 (p = 1.8e-11); medias 3.98
   vs. 4.47, pero medianas casi idénticas (3.15 vs. 3.14). La diferencia se
-  concentra en la cola alta (p99: 14.4 vs. 24.9).
+  concentra en la cola alta (p99: 14.4 vs. 24.9)
+  (`tabla_itt_nivel_experimento.csv`,
+  `descriptivas_revenue_por_grupo_experimento.csv`).
 - **Quiebre en `time_spent` = 5 minutos** en la relación con `Revenue`,
   encontrado por rejilla en entrenamiento y confirmado fuera de muestra en
   **ambas bases** (salto de nivel ≈3.13 obs. / ≈3.42 exp., significativo en
@@ -287,7 +289,10 @@ directorio de trabajo sea la raíz. Scripts en `02_Scripts/`:
 - **Asociación `sign_up`–`log(Revenue)` en la base observacional**
   (correlacional, no causal): coeficiente 0.102 sin controles, 0.080 con
   controles observables, 0.047 al agregar `log(time_spent)`; significativo en
-  los tres casos (`10_regresion_correlacional_observacional.R`).
+  los tres casos (`tabla_correlacional_signup_observacional.docx`). La misma
+  asociación en nivel (dólares por sesión), que es como se reporta en la
+  presentación: 0.548 sin controles y 0.210 al controlar además por
+  `time_spent` (`tabla_asociacion_signup_nivel_observacional.csv`).
 - **Elasticidad `Revenue`–`time_spent`** en la base observacional: ≈0.169% de
   cambio en `Revenue` por 1% de cambio en `time_spent`, estable entre el
   modelo simple y el modelo con controles, significativa en ambos
@@ -302,7 +307,7 @@ directorio de trabajo sea la raíz. Scripts en `02_Scripts/`:
   (`representatividad_experimento_vs_historico.xlsx`); es decir, no hay
   evidencia de que la muestra del experimento sea distinta de la población
   histórica en esas características.
-- En `03_Resultados/` hay 14 figuras y 26 tablas, todas regenerables desde los
+- En `03_Resultados/` hay 14 figuras y 30 tablas, todas regenerables desde los
   scripts.
 - La presentación final para CheMarket ya está en
   `08_Entregables/CheMarket_deck.pdf`, con el link al video en

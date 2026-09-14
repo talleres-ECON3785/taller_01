@@ -75,7 +75,11 @@ itt_sencillo <- lm(log_revenue ~ easier_signup, data = experimento)
 modelsummary(itt_sencillo)
 
 #estimamos ITT con controles
-itt_controles_nivel <- lm(
+# nota: este modelo corre sobre 'log_revenue', igual que 'itt_sencillo'. Antes
+# se llamaba 'itt_controles_nivel', nombre que sugeria erroneamente que la
+# variable dependiente estaba en nivel; el ITT en nivel se estima en la
+# seccion 2b
+itt_controles_log <- lm(
   log_revenue ~ easier_signup + log_time_spent +
     device_type + os_type + past_sessions,
   data = experimento
@@ -83,7 +87,7 @@ itt_controles_nivel <- lm(
 
 modelos_itt <- list(
   "ITT sencillo" = itt_sencillo,
-  "ITT con controles" = itt_controles_nivel
+  "ITT con controles" = itt_controles_log
 )
 
 # etiquetas en espanol para reportar; el nivel de referencia de cada
@@ -116,6 +120,100 @@ modelsummary(
   stars = c("*" = 0.1, "**" = 0.05, "***" = 0.01),
   title = "Efecto del registro facilitado sobre log(Revenue) (ITT)",
   output = "03_Resultados/Tablas/tabla_itt_experimento.docx"
+)
+
+
+#------------------------------------------------------
+# 2b. ITT sobre 'Revenue' en nivel y forma de la distribucion
+#------------------------------------------------------
+
+# el ITT en logaritmo (seccion anterior) responde "en que porcentaje cambia el
+# ingreso"; el ITT en nivel responde "en cuantos dolares por sesion cambia".
+# Se reportan los dos porque no coinciden en significancia, y esa discrepancia
+# es en si misma un resultado: el nivel esta dominado por la cola alta de
+# 'Revenue' y el logaritmo es mas robusto a esos valores extremos.
+# Ambas especificaciones son regresion lineal; solo cambia la transformacion
+# de la variable dependiente.
+
+itt_nivel_sencillo <- lm(Revenue ~ easier_signup, data = experimento)
+
+itt_nivel_controles <- lm(
+  Revenue ~ easier_signup + log_time_spent +
+    device_type + os_type + past_sessions,
+  data = experimento
+)
+
+modelos_itt_nivel <- list(
+  "ITT nivel sencillo" = itt_nivel_sencillo,
+  "ITT nivel con controles" = itt_nivel_controles
+)
+
+# se exporta el coeficiente de 'easier_signup' de cada especificacion para que
+# el numero que se cita en la presentacion tenga respaldo en un archivo
+tabla_itt_nivel <- tibble(
+  modelo = names(modelos_itt_nivel),
+  coef_easier_signup = c(
+    coef(itt_nivel_sencillo)["easier_signup"],
+    coef(itt_nivel_controles)["easier_signup"]
+  ),
+  error_estandar = c(
+    summary(itt_nivel_sencillo)$coefficients["easier_signup", "Std. Error"],
+    summary(itt_nivel_controles)$coefficients["easier_signup", "Std. Error"]
+  ),
+  p_valor = c(
+    summary(itt_nivel_sencillo)$coefficients["easier_signup", "Pr(>|t|)"],
+    summary(itt_nivel_controles)$coefficients["easier_signup", "Pr(>|t|)"]
+  ),
+  ic_inferior = c(
+    confint(itt_nivel_sencillo)["easier_signup", 1],
+    confint(itt_nivel_controles)["easier_signup", 1]
+  ),
+  ic_superior = c(
+    confint(itt_nivel_sencillo)["easier_signup", 2],
+    confint(itt_nivel_controles)["easier_signup", 2]
+  ),
+  r2 = c(
+    summary(itt_nivel_sencillo)$r.squared,
+    summary(itt_nivel_controles)$r.squared
+  ),
+  n = c(
+    length(residuals(itt_nivel_sencillo)),
+    length(residuals(itt_nivel_controles))
+  )
+)
+
+write_csv(
+  tabla_itt_nivel,
+  "03_Resultados/Tablas/tabla_itt_nivel_experimento.csv"
+)
+
+# el promedio y la mediana de 'Revenue' cuentan historias distintas entre
+# grupos, asi que se exportan juntos con los percentiles altos: es la evidencia
+# de que la diferencia en nivel se concentra en la cola y no en el usuario
+# tipico
+descriptivas_revenue_grupo <- experimento |>
+  group_by(easier_signup) |>
+  summarise(
+    n = n(),
+    media = mean(Revenue),
+    mediana = median(Revenue),
+    desv_estandar = sd(Revenue),
+    p90 = unname(quantile(Revenue, 0.90)),
+    p99 = unname(quantile(Revenue, 0.99)),
+    maximo = max(Revenue),
+    .groups = "drop"
+  ) |>
+  mutate(
+    grupo = if_else(
+      easier_signup == 1, "Tratamiento (registro facilitado)", "Control"
+    ),
+    .before = 1
+  ) |>
+  select(-easier_signup)
+
+write_csv(
+  descriptivas_revenue_grupo,
+  "03_Resultados/Tablas/descriptivas_revenue_por_grupo_experimento.csv"
 )
 
 
